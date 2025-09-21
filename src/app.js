@@ -1,29 +1,48 @@
-// console.log('checkk');
 
-// it is making a server by http core node module
-// const http= require('http')
-
-// const server = http.createServer((req,res)=>{
-//      res.end('hello from server')
-// })
-
-// server.listen(3000,()=>{
-//     console.log('server is listening on 3000 port')
-// })
 
 
 const express=require('express')
-
+const connectDB=require('./config/database')// it means the database.js runs totaly !
+const UserModel=require('./schema/user.schema')
 const app=express()
+app.use('/user',(req,res,next)=>{
+    console.log('user route middleware')
+    next()
 
-app.use((req,res)=>{
-   res.send('hi')
 })
 
-app.use((req,res)=>{
-   res.send('hello')
+app.post('/user',async(req,res)=>{
+      console.log('user route')
+     try {
+         const user= new UserModel({
+        name:'Apurba Bhadra',
+        email:'apurbabhadra@gmail.com',
+        password:'123456',
+        age:25
+      })
+
+      await user.save()
+      res.status(201).send('user created')
+     } catch (error) {
+        //   res.status(400).send(error.message)
+        throw new Error(error.message)// inside catch if again throw error on that time use new Error not error
+     }
+
 })
 
+app.use('/',(err,req,res,next)=>{
+    console.log("🚀 ~ err:", err)
+    console.log('home route')
+    res.send(err.message)
+})
+
+
+
+
+connectDB().then(()=>{
+    console.log('connected to database')
 app.listen(3000,()=>{
     console.log('server is listening on port 3000')
-})
+})})
+
+
